@@ -1,0 +1,2 @@
+# optional: only needed for real sound
+pygame
