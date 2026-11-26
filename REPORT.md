@@ -1,7 +1,7 @@
 # Laboratory Work No. 2: Structural Design Patterns
 
 **Course:** TMPS (Software Design Techniques and Mechanisms)
-**Author:** *<your name, group>*
+**Author:** Romanov Dana, FAF-241
 **Language:** C# (.NET 8)
 
 ---
