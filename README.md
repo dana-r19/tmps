@@ -3,10 +3,10 @@
 A console music player in C# that applies three structural design patterns, **Composite**, **Decorator** and **Facade**, on top of the creational patterns from Lab 1 (**Singleton**, **Factory Method**, **Builder**). Full explanation, UML diagrams and tests are in [REPORT.md](REPORT.md).
 
 No sound is produced: "playing" prints what would be played, with the volume and fade-in in effect. This is enough for the lab (console app) and means no libraries are needed.
-dotnet run --project src/MusicPlayer -- --play
+
 ## Requirements
 
-- [.NET SDK](https://dotnet.microsoft.com/downloaddotnet run --project src/MusicPlayer -- --play) 8.0 or newer. Check with `dotnet --version`.
+- [.NET SDK](https://dotnet.microsoft.com/download) 8.0 or newer. Check with `dotnet --version`.
 - Internet on the first build only (to restore the xUnit test packages).
 
 The projects target `net8.0` and are set to run on newer runtimes too (`RollForward=Major`). If the build complains about the target framework, change `<TargetFramework>` to your SDK's version (for example `net10.0`) in both `.csproj` files.
