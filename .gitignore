@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+TestResults/
+
+# Commercial songs: keep local only (public repo)
+songs/*.mp3
