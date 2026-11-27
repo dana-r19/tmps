@@ -10,9 +10,13 @@ namespace MusicPlayer.Structural.Facade;
 /// FACADE - each method is one or two delegating calls into the subsystem
 /// (Factory Method, Builder, Composite, Decorator, audio output). The facade itself only
 /// keeps a name-to-item library.
+/// The facade adds no new features of its own: it only hides HOW the subsystem classes
+/// are created and connected. The comments on each method show which pattern it calls.
 /// </summary>
 public sealed class MusicPlayerFacade : IMusicPlayer
 {
+    // Subsystem parts are injected, so the facade can be used with a console output,
+    // real speakers, or a recording output in the unit tests.
     private readonly IAudioOutput _output;
     private readonly SongLoaderRegistry _loaders;
     private readonly Dictionary<string, IPlayable> _items = new Dictionary<string, IPlayable>();
@@ -66,9 +70,12 @@ public sealed class MusicPlayerFacade : IMusicPlayer
         playlist.Add(Find(itemName));
     }
 
+    // The three With... methods hide Decorator construction: the client passes a name,
+    // the facade looks up the item, wraps it, and stores the result under a new name.
+    // Because the result is stored too, decorators can be stacked by calling these again.
     public string WithVolume(string itemName, int percent)
     {
-        return Store(new VolumeDecorator(Find(itemName), percent));
+        return Store(new VolumeDecorator(Find(itemName), percent));   // Decorator
     }
 
     public string WithFadeIn(string itemName, int? seconds = null)
@@ -83,11 +90,15 @@ public sealed class MusicPlayerFacade : IMusicPlayer
         return Store(new LoopDecorator(Find(itemName), count));
     }
 
+    // One call from the client starts the whole chain:
+    // Facade -> Composite (playlist recursion) -> Decorators (effects) -> audio output.
     public void Play(string itemName)
     {
         Find(itemName).Play(_output);
     }
 
+    // Internal library: maps the names the client uses to the real IPlayable objects,
+    // so subsystem objects never leak out of the facade.
     private string Store(IPlayable item)
     {
         _items[item.Name] = item;

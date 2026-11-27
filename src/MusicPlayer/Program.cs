@@ -1,6 +1,11 @@
 // CLIENT: talks only to IMusicPlayer (the Facade). It never touches loaders, builders,
 // playlists or decorators directly.
 //
+// Where the structural patterns are:
+//   Composite -> Structural/Composite  (IPlayable, Track, Playlist)
+//   Decorator -> Structural/Decorator  (PlayableDecorator, Volume/FadeIn/Loop decorators)
+//   Facade    -> Structural/Facade     (IMusicPlayer, MusicPlayerFacade)
+//
 //   dotnet run --project src/MusicPlayer                     console demo (no sound)
 //   dotnet run --project src/MusicPlayer -- --play [folder]  play real files (default folder: songs)
 using MusicPlayer.Creational;
