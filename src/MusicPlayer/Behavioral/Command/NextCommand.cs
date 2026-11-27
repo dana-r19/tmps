@@ -9,7 +9,7 @@ namespace MusicPlayer.Behavioral.Command;
 /// </summary>
 public sealed class NextCommand : ICommand
 {
-    private readonly IPlaybackSession _session;
+    private readonly IPlaybackSession _session;   // the RECEIVER (interface only)
 
     public NextCommand(IPlaybackSession session)
     {
@@ -18,5 +18,7 @@ public sealed class NextCommand : ICommand
 
     public string Description => "next";
 
+    // COMMAND -> STATE: the command only forwards the request. The session hands it to its
+    // current state, which may reject it (returns false, so the invoker logs "(rejected)").
     public bool Execute() => _session.Next();
 }

@@ -16,15 +16,19 @@ internal static class BehavioralDemo
 {
     public static void Run()
     {
+        // Lab 2 FACADE builds the library and opens the session. From here on the demo only
+        // uses abstractions: IPlaybackSession, ICommand, IPlaybackObserver, IPlaybackOrder.
         IAudioOutput output = new ConsoleAudioOutput(PlayerSettings.Instance.DefaultVolume);
         IMusicPlayer player = new MusicPlayerFacade(output, SongLoaderRegistry.CreateDefault());
-        IPlaybackSession session = player.OpenSession(DemoLibrary.Create(player));
-        CommandInvoker remote = new CommandInvoker();
+        IPlaybackSession session = player.OpenSession(DemoLibrary.Create(player));   // STATE context + OBSERVER subject
+        CommandInvoker remote = new CommandInvoker();                                 // COMMAND invoker
 
         Section("1) Queue built with the Lab 2 facade (songs, decorated songs, a nested playlist)");
         PrintQueue(session);
 
         Section("2) Observers subscribe at runtime");
+        // OBSERVER: three independent observers. The session only sees IPlaybackObserver.
+        // (stats is kept as its concrete type only so the demo can print its Summary at the end.)
         ListeningStats stats = new ListeningStats();
         IPlaybackObserver display = new NowPlayingDisplay(Console.Out);
         IPlaybackObserver loudWarning = new LoudVolumeWarning(85, Console.Out);
@@ -33,6 +37,8 @@ internal static class BehavioralDemo
         session.Subscribe(loudWarning);
         Console.WriteLine("   subscribed: display, stats, loud-volume warning");
 
+        // COMMAND -> STATE -> OBSERVER: each button press is a command object run by the invoker.
+        // The session's current state decides what it means, and the observers print the result.
         Section("3) Commands drive the State machine (Stopped -> Playing -> Paused -> Playing)");
         Run(remote, new PlayCommand(session));
         Run(remote, new PauseCommand(session));
@@ -44,13 +50,14 @@ internal static class BehavioralDemo
         Run(remote, new SetVolumeCommand(session, 95));
         Undo(remote);
 
+        // COMMAND + STRATEGY: the command carries a new IPlaybackOrder; undo puts the old one back.
         Section("5) Strategy swapped at runtime: shortest first");
         Run(remote, new ChangeOrderCommand(session, new ShortestFirstOrder()));
         Run(remote, new NextCommand(session));
         Undo(remote);                                // back to sequential order
 
         Section("6) Stats observer unsubscribes; macro command 'party mode' (shuffle + volume 100)");
-        session.Unsubscribe(stats);
+        session.Unsubscribe(stats);                  // OBSERVER: stats stops receiving events from now on
         Console.WriteLine("   unsubscribed: stats");
         Run(remote, new MacroCommand("party mode",
             new ChangeOrderCommand(session, new ShuffleOrder(new Random(7))),
@@ -70,6 +77,8 @@ internal static class BehavioralDemo
         Console.WriteLine($"   stats: {stats.Summary()} (counted only while subscribed)");
     }
 
+    // The client never calls session.Play() directly: every request goes through the invoker
+    // as an ICommand, so it is logged (and undoable if it is an IUndoableCommand).
     private static void Run(CommandInvoker remote, ICommand command)
     {
         Console.WriteLine($"> {command.Description}");

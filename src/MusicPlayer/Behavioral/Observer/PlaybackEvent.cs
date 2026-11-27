@@ -2,23 +2,25 @@ using MusicPlayer.Structural.Composite;
 
 namespace MusicPlayer.Behavioral.Observer;
 
+/// <summary>What kind of change happened. Observers filter on this.</summary>
 public enum PlaybackEventKind
 {
-    StateChanged,
-    TrackStarted,
-    VolumeChanged,
-    OrderChanged,
-    ActionRejected,
+    StateChanged,     // e.g. Stopped -> Playing (published by PlaybackSession.TransitionTo)
+    TrackStarted,     // a queue item started playing (PlaybackSession.PlayCurrent)
+    VolumeChanged,    // PlaybackSession.SetVolume
+    OrderChanged,     // the Strategy was swapped (PlaybackSession.SetOrder)
+    ActionRejected,   // the current State did not allow an action (PlaybackSession.Reject)
 }
 
 /// <summary>
-/// OBSERVER - what the subject sends to its observers. It is an immutable copy of the facts, so an
-/// observer never needs a reference back to the player (and cannot start an update loop by
-/// changing it while being notified).
+/// OBSERVER - the message the subject sends to its observers ("push" model: the data travels
+/// with the notification). It is an immutable record, a snapshot of the facts at that moment.
+/// Observers never get a reference back to the player, so they cannot change it while being
+/// notified, and an endless update loop is impossible.
 /// </summary>
 public sealed record PlaybackEvent(
     PlaybackEventKind Kind,
-    string Message,
-    string State,
-    IPlayable? Track,
-    int Volume);
+    string Message,       // human-readable description, e.g. "Playing -> Paused"
+    string State,         // name of the state at the moment of the event
+    IPlayable? Track,     // the current queue item (null if the queue is empty)
+    int Volume);          // master volume at the moment of the event

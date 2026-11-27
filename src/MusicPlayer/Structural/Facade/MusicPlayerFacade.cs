@@ -90,6 +90,9 @@ public sealed class MusicPlayerFacade : IMusicPlayer
         Find(itemName).Play(_output);
     }
 
+    // Lab 3 bridge: the FACADE turns library names into IPlayable objects (Composite/Decorator)
+    // and wires them into a PlaybackSession (STATE context) with a default STRATEGY.
+    // The client gets back only the IPlaybackSession interface.
     public IPlaybackSession OpenSession(params string[] itemNames)
     {
         IPlayable[] items = itemNames.Select(Find).ToArray();

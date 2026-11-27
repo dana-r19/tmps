@@ -9,6 +9,6 @@ public sealed class ReverseOrder : IPlaybackOrder
 
     public IReadOnlyList<IPlayable> Arrange(IReadOnlyList<IPlayable> items)
     {
-        return items.Reverse().ToList();
+        return items.Reverse().ToList();   // LINQ Reverse returns a new sequence; the input is unchanged
     }
 }

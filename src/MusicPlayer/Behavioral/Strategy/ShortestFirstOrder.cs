@@ -13,6 +13,8 @@ public sealed class ShortestFirstOrder : IPlaybackOrder
 
     public IReadOnlyList<IPlayable> Arrange(IReadOnlyList<IPlayable> items)
     {
+        // DurationSeconds is answered by each IPlayable itself: a Track returns its song length,
+        // a Playlist sums its children, a LoopDecorator multiplies. The strategy does not care which.
         return items.OrderBy(item => item.DurationSeconds).ToList();
     }
 }

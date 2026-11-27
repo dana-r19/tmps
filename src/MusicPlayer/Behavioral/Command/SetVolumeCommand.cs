@@ -8,12 +8,13 @@ namespace MusicPlayer.Behavioral.Command;
 /// </summary>
 public sealed class SetVolumeCommand : IUndoableCommand
 {
-    private readonly IPlaybackSession _session;
-    private readonly int _percent;
-    private int _previous;
+    private readonly IPlaybackSession _session;   // the RECEIVER (an interface, not PlaybackSession)
+    private readonly int _percent;                // the request's parameter
+    private int _previous;                        // the state needed for Undo
 
     public SetVolumeCommand(IPlaybackSession session, int percent)
     {
+        // Validate when the command is CREATED, so a bad value never reaches the invoker.
         if (percent < 0 || percent > 100)
         {
             throw new ArgumentOutOfRangeException(nameof(percent), "Volume must be between 0 and 100.");
@@ -27,13 +28,13 @@ public sealed class SetVolumeCommand : IUndoableCommand
 
     public bool Execute()
     {
-        _previous = _session.Volume;
-        _session.SetVolume(_percent);
+        _previous = _session.Volume;     // 1. remember what to go back to
+        _session.SetVolume(_percent);    // 2. let the receiver do the work
         return true;
     }
 
     public void Undo()
     {
-        _session.SetVolume(_previous);
+        _session.SetVolume(_previous);   // reverse: same receiver method, old value
     }
 }

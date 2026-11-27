@@ -29,6 +29,7 @@ internal sealed class InteractiveShell
         _input = input;
         _out = output;
 
+        // STRATEGY: word -> new strategy object. A new order = new class + one line here.
         _orders = new Dictionary<string, Func<IPlaybackOrder>>(StringComparer.OrdinalIgnoreCase)
         {
             ["sequential"] = () => new SequentialOrder(),
@@ -37,6 +38,7 @@ internal sealed class InteractiveShell
             ["shortest"] = () => new ShortestFirstOrder(),
         };
 
+        // OBSERVER: the observers the user can switch on and off ("watch"/"unwatch") at runtime.
         _observers = new Dictionary<string, IPlaybackObserver>(StringComparer.OrdinalIgnoreCase)
         {
             ["display"] = new NowPlayingDisplay(output),
@@ -44,6 +46,8 @@ internal sealed class InteractiveShell
             ["loud"] = new LoudVolumeWarning(85, output),
         };
 
+        // COMMAND: word typed by the user -> command object. The shell has no playback logic;
+        // it only builds commands and gives them to the invoker. A new command = new class + one line.
         _commands = new Dictionary<string, Func<string?, ICommand>>(StringComparer.OrdinalIgnoreCase)
         {
             ["play"] = _ => new PlayCommand(_session),
@@ -100,7 +104,7 @@ internal sealed class InteractiveShell
     {
         if (_commands.TryGetValue(word, out Func<string?, ICommand>? create))
         {
-            _remote.Execute(create(argument));
+            _remote.Execute(create(argument));   // COMMAND: invoker runs, logs, maybe stores for undo
             return;
         }
 
@@ -113,11 +117,11 @@ internal sealed class InteractiveShell
                 }
                 break;
             case "watch":
-                _session.Subscribe(Lookup(_observers, argument, "observer"));
+                _session.Subscribe(Lookup(_observers, argument, "observer"));     // OBSERVER: attach at runtime
                 _out.WriteLine($"   '{argument}' subscribed");
                 break;
             case "unwatch":
-                _session.Unsubscribe(Lookup(_observers, argument, "observer"));
+                _session.Unsubscribe(Lookup(_observers, argument, "observer"));   // OBSERVER: detach at runtime
                 _out.WriteLine($"   '{argument}' unsubscribed");
                 break;
             case "queue":

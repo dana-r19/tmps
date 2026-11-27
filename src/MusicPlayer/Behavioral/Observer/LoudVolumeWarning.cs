@@ -1,6 +1,10 @@
 namespace MusicPlayer.Behavioral.Observer;
 
-/// <summary>OBSERVER - concrete observer: warns when the volume is raised above a safe level.</summary>
+/// <summary>
+/// OBSERVER - concrete observer: warns when the volume is raised above a safe level.
+/// It only WARNS; it does not lower the volume itself. Changing the player from inside
+/// Update would trigger another VolumeChanged event and could start an update loop.
+/// </summary>
 public sealed class LoudVolumeWarning : IPlaybackObserver
 {
     private readonly int _threshold;
@@ -14,6 +18,7 @@ public sealed class LoudVolumeWarning : IPlaybackObserver
 
     public int WarningCount { get; private set; }
 
+    // OBSERVER: reacts only to VolumeChanged events above the threshold.
     public void Update(PlaybackEvent playbackEvent)
     {
         if (playbackEvent.Kind == PlaybackEventKind.VolumeChanged && playbackEvent.Volume > _threshold)
