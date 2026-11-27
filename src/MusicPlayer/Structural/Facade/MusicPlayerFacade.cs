@@ -1,3 +1,5 @@
+using MusicPlayer.Behavioral.State;
+using MusicPlayer.Behavioral.Strategy;
 using MusicPlayer.Creational;
 using MusicPlayer.Domain.Audio;
 using MusicPlayer.Domain.Models;
@@ -86,6 +88,12 @@ public sealed class MusicPlayerFacade : IMusicPlayer
     public void Play(string itemName)
     {
         Find(itemName).Play(_output);
+    }
+
+    public IPlaybackSession OpenSession(params string[] itemNames)
+    {
+        IPlayable[] items = itemNames.Select(Find).ToArray();
+        return new PlaybackSession(_output, items, new SequentialOrder());   // State + Strategy (Lab 3)
     }
 
     private string Store(IPlayable item)

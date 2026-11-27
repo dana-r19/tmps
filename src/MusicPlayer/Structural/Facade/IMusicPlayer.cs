@@ -1,3 +1,5 @@
+using MusicPlayer.Behavioral.State;
+
 namespace MusicPlayer.Structural.Facade;
 
 /// <summary>
@@ -20,4 +22,10 @@ public interface IMusicPlayer
     string WithFadeIn(string itemName, int? seconds = null);
     string WithLoop(string itemName, int? times = null);
     void Play(string itemName);
+
+    /// <summary>
+    /// Lab 3: queues the named items (each can be a song, a decorated item or a whole playlist)
+    /// in a playback session that is controlled step by step (play, pause, next, ...).
+    /// </summary>
+    IPlaybackSession OpenSession(params string[] itemNames);
 }
